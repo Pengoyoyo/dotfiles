@@ -5,7 +5,7 @@ Persönliche Konfigurationsdateien, verwaltet mit GNU Stow.
 
 ## Installation
 
-git clone https://github.com/DEINNAME/dotfiles.git ~/dotfiles
+git clone https://github.com/Pengoyoyo/dotfiles.git ~/dotfiles
 cd ~/dotfiles
 stow */
 
