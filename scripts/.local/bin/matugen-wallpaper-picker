@@ -1,0 +1,420 @@
+#!/usr/bin/env python3
+import sys
+import os
+import subprocess
+import re
+import hashlib
+from concurrent.futures import ThreadPoolExecutor
+from PyQt5.QtWidgets import (
+    QApplication, QWidget, QLabel, QGridLayout, QVBoxLayout, QScrollArea
+)
+from PyQt5.QtGui import QPixmap, QCursor
+from PyQt5.QtCore import Qt, QObject, QEvent, QTimer, QThread, pyqtSignal
+from PIL import Image
+
+# ------------------- Config -------------------
+WALLPAPER_DIR = os.path.expanduser("~/.config/omarchy/themes/matugen-themeswitcher/backgrounds")
+MATUGEN_HOOK = os.path.expanduser("~/.config/omarchy/hooks/matugen-new-background")
+THUMB_SIZE = 150
+SPACING = 15
+MATUGEN_CSS = os.path.expanduser("~/.config/omarchy/themes/matugen-themeswitcher/waybar.css")
+CACHE_DIR = os.path.expanduser("~/.cache/omarchy/wallpaper-thumbs")
+
+# Create cache directory
+os.makedirs(CACHE_DIR, exist_ok=True)
+
+# ------------------- Helper Functions -------------------
+def get_cache_path(image_path, size):
+    """Generate cache filename based on image path and mtime"""
+    mtime = os.path.getmtime(image_path)
+    cache_key = f"{image_path}_{mtime}_{size}"
+    hash_key = hashlib.md5(cache_key.encode()).hexdigest()
+    return os.path.join(CACHE_DIR, f"{hash_key}.jpg")
+
+def generate_thumbnail(image_path, size):
+    """Generate thumbnail using PIL (much faster than QPixmap)"""
+    cache_path = get_cache_path(image_path, size)
+    
+    # Return cached thumbnail if exists
+    if os.path.exists(cache_path):
+        return cache_path
+    
+    try:
+        # Use PIL for fast thumbnail generation
+        with Image.open(image_path) as img:
+            img.thumbnail((size, size), Image.Resampling.LANCZOS)
+            img.save(cache_path, "JPEG", quality=85, optimize=True)
+        return cache_path
+    except Exception as e:
+        print(f"Error generating thumbnail for {image_path}: {e}")
+        return None
+
+def get_matugen_colors():
+    """Parse generated Matugen colors from CSS"""
+    colors = {}
+    if not os.path.exists(MATUGEN_CSS):
+        colors = {
+            "background": "#121212",
+            "foreground": "#eaeaea",
+            "accent": "#8a8a8d",
+            "background_alt": "#1e1e1e"
+        }
+    else:
+        pattern = re.compile(r"@define-color\s+(\w+)\s+(#[0-9a-fA-F]{6})")
+        with open(MATUGEN_CSS) as f:
+            for line in f:
+                match = pattern.search(line)
+                if match:
+                    name, value = match.groups()
+                    colors[name] = value
+
+    mapped = {
+        "background": colors.get("background", "#121212"),
+        "foreground": colors.get("foreground", "#eaeaea"),
+        "accent": colors.get("primary", "#8a8a8d"),
+        "background_alt": colors.get("background", "#1e1e1e")
+    }
+    return mapped
+
+# ------------------- Thumbnail Loader Thread -------------------
+class ThumbnailLoader(QThread):
+    thumbnail_ready = pyqtSignal(int, str)
+    all_loaded = pyqtSignal()
+
+    def __init__(self, wallpapers, thumb_size):
+        super().__init__()
+        self.wallpapers = wallpapers
+        self.thumb_size = thumb_size
+        self.running = True
+
+    def run(self):
+        """Load thumbnails in parallel using ThreadPoolExecutor"""
+        def load_thumb(index_path):
+            index, path = index_path
+            if not self.running:
+                return None
+            thumb_path = generate_thumbnail(path, self.thumb_size)
+            return (index, thumb_path)
+
+        # Use parallel processing for thumbnail generation
+        with ThreadPoolExecutor(max_workers=4) as executor:
+            results = executor.map(load_thumb, enumerate(self.wallpapers))
+            
+            for result in results:
+                if not self.running or result is None:
+                    break
+                index, thumb_path = result
+                if thumb_path:
+                    self.thumbnail_ready.emit(index, thumb_path)
+        
+        self.all_loaded.emit()
+
+    def stop(self):
+        self.running = False
+
+# ------------------- Event Filter for Hover -------------------
+class HoverFilter(QObject):
+    def __init__(self, func):
+        super().__init__()
+        self.func = func
+
+    def eventFilter(self, obj, event):
+        if event.type() == QEvent.Enter:
+            self.func(obj)
+        return False
+
+# ------------------- Main Class -------------------
+class WallpaperPicker(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Matugen Wallpaper Picker")
+        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
+        self.setFocusPolicy(Qt.StrongFocus)
+        
+        # Set the window class properly for Wayland
+        app = QApplication.instance()
+        if app:
+            app.setDesktopFileName("matugen-picker")
+
+
+        # Get wallpapers
+        self.wallpaper_paths = []
+        if os.path.exists(WALLPAPER_DIR):
+            files = [f for f in os.listdir(WALLPAPER_DIR)
+                    if f.lower().endswith((".png", ".jpg", ".jpeg"))]
+            files.sort()
+            self.wallpaper_paths = [os.path.join(WALLPAPER_DIR, f) for f in files]
+
+        if not self.wallpaper_paths:
+            print(f"No wallpapers found in {WALLPAPER_DIR}")
+            sys.exit(1)
+
+        self.selected_index = 0
+        self.colors = get_matugen_colors()
+        self.preview_process = None
+        self.grid_cols = 4
+        self.loader = None
+
+        # Debounce timer for preview (avoid spawning on every keypress)
+        self.preview_timer = QTimer()
+        self.preview_timer.setSingleShot(True)
+        self.preview_timer.timeout.connect(self._do_preview)
+        self.pending_preview_path = None
+
+        # Main layout
+        self.main_layout = QVBoxLayout()
+        self.main_layout.setContentsMargins(0, 0, 0, 0)
+        self.main_layout.setSpacing(0)
+
+        # Scroll area
+        self.scroll = QScrollArea()
+        self.scroll.setWidgetResizable(True)
+        self.scroll.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        self.scroll.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.scroll.setStyleSheet(f"""
+            QScrollArea {{ 
+                background-color: {self.colors['background']}; 
+                border: none;
+            }}
+            QScrollBar:vertical {{
+                width: 10px;
+                background: {self.colors['background']};
+                border: none;
+            }}
+            QScrollBar::handle:vertical {{
+                background: {self.colors['accent']};
+                border-radius: 5px;
+                min-height: 20px;
+            }}
+            QScrollBar::handle:vertical:hover {{
+                background: {self.colors['foreground']};
+            }}
+            QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {{
+                height: 0px;
+            }}
+        """)
+
+        self.inner = QWidget()
+        self.inner.setStyleSheet(f"background-color: {self.colors['background']};")
+        self.grid = QGridLayout()
+        self.grid.setSpacing(SPACING)
+        self.grid.setContentsMargins(SPACING, SPACING, SPACING, SPACING)
+        self.inner.setLayout(self.grid)
+        self.scroll.setWidget(self.inner)
+
+        self.main_layout.addWidget(self.scroll)
+        self.setLayout(self.main_layout)
+
+        # Create placeholder labels
+        self.labels = []
+        self.create_placeholders()
+
+        # Start loading thumbnails
+        self.start_thumbnail_loading()
+
+        # Recalculate grid on resize
+        self.resizeTimer = QTimer()
+        self.resizeTimer.setSingleShot(True)
+        self.resizeTimer.timeout.connect(self.rebuild_grid)
+
+        self.update_selection()
+
+    def create_placeholders(self):
+        """Create placeholder labels without images"""
+        self.grid_cols = self.calculate_columns()
+        row, col = 0, 0
+
+        for i, path in enumerate(self.wallpaper_paths):
+            label = QLabel()
+            label.setFixedSize(THUMB_SIZE + 10, THUMB_SIZE + 10)
+            label.setAlignment(Qt.AlignCenter)
+            label.setCursor(QCursor(Qt.PointingHandCursor))
+            label.setStyleSheet(f"""
+                border: 3px solid transparent; 
+                border-radius: 8px;
+                padding: 5px;
+                background-color: {self.colors['background_alt']};
+            """)
+
+            label.mousePressEvent = lambda e, p=path: self.apply_wallpaper(p)
+            label.installEventFilter(HoverFilter(
+                lambda obj, idx=i: self.set_selected(idx)
+            ))
+
+            self.grid.addWidget(label, row, col)
+            self.labels.append(label)
+
+            col += 1
+            if col >= self.grid_cols:
+                col = 0
+                row += 1
+
+    def start_thumbnail_loading(self):
+        """Start background thumbnail loading"""
+        self.loader = ThumbnailLoader(self.wallpaper_paths, THUMB_SIZE)
+        self.loader.thumbnail_ready.connect(self.on_thumbnail_ready)
+        self.loader.start()
+
+    def on_thumbnail_ready(self, index, thumb_path):
+        """Update label when thumbnail is ready"""
+        if index < len(self.labels) and thumb_path:
+            pixmap = QPixmap(thumb_path)
+            self.labels[index].setPixmap(pixmap)
+
+    def calculate_columns(self):
+        """Calculate optimal number of columns"""
+        width = self.scroll.viewport().width()
+        cols = max(1, (width - SPACING) // (THUMB_SIZE + SPACING))
+        return cols
+
+    def rebuild_grid(self):
+        """Rebuild grid with new column count"""
+        new_cols = self.calculate_columns()
+        if new_cols == self.grid_cols:
+            return
+
+        self.grid_cols = new_cols
+
+        for i in reversed(range(self.grid.count())): 
+            self.grid.itemAt(i).widget().setParent(None)
+
+        row, col = 0, 0
+        for label in self.labels:
+            self.grid.addWidget(label, row, col)
+            col += 1
+            if col >= self.grid_cols:
+                col = 0
+                row += 1
+
+        self.scroll_to_selection()
+
+    def resizeEvent(self, event):
+        """Handle window resize"""
+        super().resizeEvent(event)
+        self.resizeTimer.start(100)
+
+    def scroll_to_selection(self):
+        """Scroll to make selected wallpaper visible"""
+        if not self.labels:
+            return
+        label = self.labels[self.selected_index]
+        self.scroll.ensureWidgetVisible(label, 50, 50)
+
+    def preview_wallpaper(self, path):
+        """Debounced preview - only spawn swaybg after 200ms delay"""
+        self.pending_preview_path = path
+        self.preview_timer.start(200)  # 200ms debounce
+
+    def _do_preview(self):
+        """Actually spawn swaybg preview"""
+        if not self.pending_preview_path:
+            return
+            
+        if self.preview_process:
+            self.preview_process.terminate()
+
+        self.preview_process = subprocess.Popen(
+            ["swaybg", "-i", self.pending_preview_path, "-m", "fill"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+
+    def apply_wallpaper(self, path):
+        """Apply wallpaper and trigger Matugen"""
+        if self.preview_process:
+            self.preview_process.terminate()
+
+        subprocess.run(["pkill", "-x", "swaybg"])
+
+        link_path = os.path.expanduser("~/.config/omarchy/current/background")
+        if os.path.exists(link_path) or os.path.islink(link_path):
+            os.remove(link_path)
+        os.symlink(path, link_path)
+
+        subprocess.Popen(
+            ["swaybg", "-i", path, "-m", "fill"],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+
+        subprocess.run([MATUGEN_HOOK, path])
+        self.close()
+
+    def set_selected(self, index):
+        """Set selected wallpaper and preview"""
+        self.selected_index = index
+        self.update_selection()
+        self.scroll_to_selection()
+
+    def keyPressEvent(self, event):
+        """Handle keyboard navigation"""
+        n = len(self.labels)
+
+        if event.key() == Qt.Key_Right:
+            self.selected_index = (self.selected_index + 1) % n
+        elif event.key() == Qt.Key_Left:
+            self.selected_index = (self.selected_index - 1) % n
+        elif event.key() == Qt.Key_Down:
+            new_index = self.selected_index + self.grid_cols
+            if new_index < n:
+                self.selected_index = new_index
+        elif event.key() == Qt.Key_Up:
+            new_index = self.selected_index - self.grid_cols
+            if new_index >= 0:
+                self.selected_index = new_index
+        elif event.key() in (Qt.Key_Return, Qt.Key_Enter):
+            self.apply_wallpaper(self.wallpaper_paths[self.selected_index])
+        elif event.key() == Qt.Key_Escape:
+            if self.preview_process:
+                self.preview_process.terminate()
+            self.close()
+
+        self.update_selection()
+        self.scroll_to_selection()
+
+    def update_selection(self):
+        """Update visual selection and preview"""
+        for i, label in enumerate(self.labels):
+            if i == self.selected_index:
+                label.setStyleSheet(f"""
+                    border: 3px solid {self.colors['accent']}; 
+                    border-radius: 8px;
+                    padding: 5px;
+                    background-color: {self.colors['background_alt']};
+                """)
+                self.preview_wallpaper(self.wallpaper_paths[i])
+            else:
+                label.setStyleSheet("""
+                    border: 3px solid transparent; 
+                    border-radius: 8px;
+                    padding: 5px;
+                """)
+
+    def closeEvent(self, event):
+        """Clean up on close"""
+        if self.loader:
+            self.loader.stop()
+            self.loader.wait()
+        if self.preview_process:
+            self.preview_process.terminate()
+        event.accept()
+
+# ------------------- Main -------------------
+if __name__ == "__main__":
+    app = QApplication(sys.argv)
+    app.setApplicationName("matugen-picker")
+    app.setDesktopFileName("matugen-picker")  # Add this line
+
+    picker = WallpaperPicker()
+
+
+    screen = app.primaryScreen().geometry()
+    picker.setGeometry(
+        (screen.width() - 1000) // 2,
+        (screen.height() - 700) // 2,
+        1000, 700
+    )
+
+    picker.show()
+    picker.setFocus()
+    sys.exit(app.exec_())

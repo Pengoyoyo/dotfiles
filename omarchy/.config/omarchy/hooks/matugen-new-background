@@ -1,0 +1,66 @@
+#!/bin/bash
+
+WALLPAPER="$1"
+LOG="/tmp/matugen-hook.log"
+
+echo "===========================================" >> "$LOG"
+echo "Hook triggered at $(date)" >> "$LOG"
+echo "Wallpaper: '$WALLPAPER'" >> "$LOG"
+
+# Validate wallpaper
+if [ -z "$WALLPAPER" ]; then
+    echo "ERROR: No wallpaper provided!" >> "$LOG"
+    exit 1
+fi
+
+if [ ! -f "$WALLPAPER" ]; then
+    echo "ERROR: Wallpaper file doesn't exist: $WALLPAPER" >> "$LOG"
+    exit 1
+fi
+
+# Run matugen and wait for completion
+CONFIG_PATH="$HOME/.config/omarchy/themes/matugen-themeswitcher/matugen/config.toml"
+echo "Running matugen..." >> "$LOG"
+
+matugen image "$WALLPAPER" --config "$CONFIG_PATH" >> "$LOG" 2>&1
+MATUGEN_EXIT=$?
+
+echo "Matugen exit code: $MATUGEN_EXIT" >> "$LOG"
+
+if [ $MATUGEN_EXIT -ne 0 ]; then
+    echo "ERROR: Matugen failed!" >> "$LOG"
+    exit 1
+fi
+
+# Wait a moment for files to be written
+sleep 0.5
+
+# List generated files
+echo "Files generated:" >> "$LOG"
+find ~/.config/omarchy/themes/matugen-themeswitcher -type f -mmin -0.5 2>> "$LOG" | tee -a "$LOG"
+
+# Reload apps (wait for each to complete)
+echo "Reloading applications..." >> "$LOG"
+
+# Reload Hyprland
+hyprctl reload >> "$LOG" 2>&1
+echo "Hyprland reloaded: $?" >> "$LOG"
+
+# Reload Waybar
+pkill -SIGUSR2 waybar
+echo "Waybar signaled: $?" >> "$LOG"
+
+# Reload Mako if running
+if pgrep -x mako > /dev/null; then
+    makoctl reload >> "$LOG" 2>&1
+    echo "Mako reloaded: $?" >> "$LOG"
+fi
+
+# Reload Kitty if running
+if pgrep -x kitty > /dev/null; then
+    pkill -SIGUSR1 kitty
+    echo "Kitty signaled: $?" >> "$LOG"
+fi
+
+echo "Hook completed successfully at $(date)" >> "$LOG"
+echo "===========================================" >> "$LOG"

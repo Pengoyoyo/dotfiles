@@ -1,0 +1,154 @@
+@import '/home/rasmus/.config/omarchy/themes/matugen-themeswitcher/waybar.css';
+
+/* ============================================
+   Global Styles
+   ============================================ */
+* {
+  font-family: "CaskaydiaMono Nerd Font", monospace;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+#waybar {
+  background-color: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+/* ============================================
+   Module Groups - Shared Styles
+   ============================================ */
+#workspaces,
+#window,
+#tray,
+#taskbar {
+  background-color: @background;
+  color: #8a8a8d;
+  padding: 4px 8px;
+  margin: 6px;
+  border-radius: 10px;
+}
+
+/* Right-aligned modules with rounded right edge */
+#clock,
+#custom-power {
+  background-color: @background;
+  color: #8a8a8d;
+  margin: 6px 6px 6px 0;
+  padding: 4px 8px;
+  border-radius: 0 10px 10px 0;
+}
+
+/* Left-aligned modules with rounded left edge */
+#network,
+#custom-lock {
+  background-color: @background;
+  color: #8a8a8d;
+  margin: 6px 0 6px 12px;
+  padding: 4px 8px;
+  border-radius: 10px 0 0 10px;
+}
+
+/* Center modules without rounded edges */
+#custom-reboot,
+#bluetooth,
+#battery,
+#pulseaudio,
+#backlight,
+#custom-temperature,
+#memory,
+#cpu {
+  background-color: @background;
+  color: #8a8a8d;
+  margin: 6px 0;
+  padding: 4px 8px;
+  transition: color 0.1s ease;
+}
+
+/* ============================================
+   Module-Specific States
+   ============================================ */
+#custom-temperature.critical,
+#pulseaudio.muted {
+  color: @error;
+}
+
+#window {
+  font-weight: 500;
+}
+
+/* ============================================
+   Hover States
+   ============================================ */
+#bluetooth:hover,
+#network:hover,
+#tray:hover,
+#backlight:hover,
+#battery:hover,
+#pulseaudio:hover,
+#custom-temperature:hover,
+#memory:hover,
+#cpu:hover,
+#clock:hover,
+#window:hover {
+  color: @primary;
+}
+
+#custom-lock:hover,
+#custom-reboot:hover,
+#custom-power:hover {
+  color: @error;
+}
+
+/* ============================================
+   Workspaces
+   ============================================ */
+#workspaces button {
+  background-color: @background;
+  color: #8a8a8d;
+  padding: 0 6px;
+  border-radius: 6px;
+  margin: 0 2px;
+  min-width: 24px;
+  transition: min-width 0.3s cubic-bezier(0.4, 0, 0.2, 1), padding 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#workspaces button:hover {
+  background-color: alpha(@primary, 0.15);
+  color: @secondary;
+}
+
+#workspaces button.active {
+  color: @primary;
+  background-color: alpha(@primary, 0.15);
+  min-width: 40px;
+  padding: 0 12px;
+}
+
+/* ============================================
+   Taskbar
+   ============================================ */
+#taskbar button {
+  border: none;
+  border-radius: 6px;
+  padding: 4px 8px;
+  margin: 0 2px;
+  color: #8a8a8d;
+  transition: background-color 0.15s ease, color 0.1s ease;
+}
+
+#taskbar button:hover {
+  background-color: alpha(@primary, 0.2);
+  color: @primary;
+}
+
+#taskbar button.active {
+  background-color: alpha(@primary, 0.25);
+  color: @primary;
+}
+
+#taskbar button.urgent {
+  color: @error;
+  animation: blink 1s ease-in-out infinite;
+}
+
