@@ -129,3 +129,12 @@ alias con='docker ps --format "table {{.ID}}\t{{.Status}}\t{{.Names}}\t{{.Image}
 
 export PATH=$PATH:/home/rasmus/.spicetify
 export PATH="$PATH:$(ruby -e "puts Gem.user_dir")/bin"
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:/home/rasmus/.lmstudio/bin"
+# End of LM Studio CLI section
+
+#Path for scripts
+export PATH="$HOME/.local/bin:$PATH"
+
+
