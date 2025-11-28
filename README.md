@@ -17,7 +17,7 @@ stow */
 - **kitty** - Kitty Terminal
 - **mako** - Benachrichtigungen
 - **shell** - Zsh Konfiguration
-- **scripts** - Lokale Scripts (matugen-wallpaper-picker)
+- **scripts** - Lokale Scripts (matugen-picker)
 
 ## Voraussetzungen
 
