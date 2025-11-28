@@ -1,0 +1,8 @@
+picker:
+  CACHE_DIR: ~/.cache/omarchy/wallpaper-thumbs
+  MATUGEN_CSS: ~/.config/omarchy/themes/matugen-themeswitcher/waybar.css
+  MATUGEN_HOOK: ~/.config/omarchy/hooks/matugen-new-background
+  SELECTED_INDEX: 4
+  SPACING: 15
+  THUMB_SIZE: 150
+  WALLPAPER_DIR: ~/.config/omarchy/themes/matugen-themeswitcher/backgrounds
