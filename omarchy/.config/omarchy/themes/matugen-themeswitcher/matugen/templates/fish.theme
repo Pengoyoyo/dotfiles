@@ -1,0 +1,34 @@
+# Matugen-generated Fish Shell Theme
+# Material Design 3 colors integrated with your Omarchy setup
+
+# Core colors
+fish_color_normal {{ colors.on_background }}
+fish_color_command {{ colors.primary }}
+fish_color_param {{ colors.on_surface_variant }}
+fish_color_keyword {{ colors.tertiary }}
+fish_color_comment {{ colors.outline }}
+fish_color_operator {{ colors.secondary }}
+fish_color_escape {{ colors.tertiary }}
+fish_color_quote {{ colors.secondary_container }}
+fish_color_redirection {{ colors.primary }}
+fish_color_end {{ colors.primary }}
+fish_color_error {{ colors.error }}
+fish_color_gray {{ colors.outline_variant }}
+
+# Completion colors
+fish_color_valid_path {{ colors.secondary }}
+fish_color_autosuggestion {{ colors.outline }}
+fish_color_selection --background={{ colors.secondary_container }}
+fish_color_search_match --background={{ colors.secondary_container }} {{ colors.on_secondary_container }}
+fish_color_history_current --bold
+
+# Prompt and UI
+fish_pager_color_background --background={{ colors.surface }}
+fish_pager_color_prefix {{ colors.primary }} --bold
+fish_pager_color_completion {{ colors.on_surface_variant }}
+fish_pager_color_description {{ colors.outline }}
+fish_pager_color_progress --background={{ colors.primary }} {{ colors.on_primary }}
+fish_pager_color_selected_background --background={{ colors.secondary_container }}
+fish_pager_color_selected_prefix {{ colors.on_secondary_container }} --bold
+fish_pager_color_selected_completion {{ colors.on_secondary_container }}
+fish_pager_color_selected_description {{ colors.on_secondary_container }}

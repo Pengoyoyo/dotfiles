@@ -1,0 +1,50 @@
+# ────────────────────────────────────────────────────────────
+# Matugen Dynamic Theme for Alacritty
+# Auto-generated from wallpaper colors
+# ────────────────────────────────────────────────────────────
+
+[window]
+# window padding {px}
+padding.x = 12
+padding.y = 12
+
+[font]
+size = 12.0
+
+[colors]
+[colors.primary]
+background = "#1a110e"
+foreground = "#f1dfd9"
+dim_foreground = "#d8c2bb"
+
+[colors.cursor]
+text = "#552009"
+cursor = "#ffb599"
+
+[colors.vi_mode_cursor]
+text = "#552009"
+cursor = "#ffb599"
+
+[colors.selection]
+text = "CellForeground"
+background = "#71361d"
+
+[colors.normal]
+black = "#1a110e"
+red = "#ffb4ab"
+green = "#d4c78e"
+yellow = "#e7beaf"
+blue = "#ffb599"
+magenta = "#ffb4ab"
+cyan = "#d4c78e"
+white = "#f1dfd9"
+
+[colors.bright]
+black = "#a08d86"
+red = "#ffb4ab"
+green = "#d4c78e"
+yellow = "#e7beaf"
+blue = "#ffb599"
+magenta = "#ffb4ab"
+cyan = "#d4c78e"
+white = "#f1dfd9"

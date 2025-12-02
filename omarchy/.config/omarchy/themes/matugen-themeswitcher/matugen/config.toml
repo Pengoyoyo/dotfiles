@@ -1,0 +1,62 @@
+[config]
+reload_apps = true
+
+[config.reload_apps_list]
+waybar = "killall -SIGUSR2 waybar"
+kitty = "killall -SIGUSR1 kitty"
+mako = "makoctl reload"
+hyprland = "hyprctl reload"
+
+[templates.alacritty]
+input_path = 'templates/alacritty.toml'
+output_path = '../alacritty.toml'
+
+[templates.waybar]
+input_path = 'templates/waybar.css'
+output_path = '../waybar.css'
+
+[templates.hyprland]
+input_path = 'templates/hyprland.conf'
+output_path = '../hyprland.conf'
+
+[templates.hyprlock]
+input_path = 'templates/hyprlock.conf'
+output_path = '../hyprlock.conf'
+
+[templates.kitty]
+input_path = 'templates/kitty.conf'
+output_path = '../kitty.conf'
+
+[templates.btop]
+input_path = 'templates/btop.theme'
+output_path = '../btop.theme'
+
+[templates.walker]
+input_path = 'templates/walker.css'
+output_path = '../walker.css'
+
+[templates.swayosd]
+input_path = 'templates/swayosd.css'
+output_path = '../swayosd.css'
+
+[templates.mako]
+input_path = 'templates/mako.ini'
+output_path = '../mako.ini'
+
+[templates.gtk3]
+input_path = 'templates/gtk.css'
+output_path = '../gtk-3.css'
+post_hook = 'gsettings set org.gnome.desktop.interface gtk-theme ""; gsettings set org.gnome.desktop.interface gtk-theme adw-gtk3-{{mode}}'
+
+[templates.gtk4]
+input_path = 'templates/gtk.css'
+output_path = '../gtk-4.css'
+
+[templates.fish]
+input_path = 'templates/fish.theme'
+output_path = '../fish.theme'
+post_hook = 'fish -c "fish_config theme choose matugen"'
+
+[templates.qt6ct]
+input_path = 'templates/qtct-colors.conf'
+output_path = '~/.config/qt6ct/colors/matugen.conf'
