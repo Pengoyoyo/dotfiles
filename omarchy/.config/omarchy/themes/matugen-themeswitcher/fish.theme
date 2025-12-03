@@ -2,33 +2,33 @@
 # Material Design 3 colors integrated with your Omarchy setup
 
 # Core colors
-fish_color_normal {"dark": Map({"color": Ident("#f1dfd9")}), "default": Map({"color": Ident("#f1dfd9")}), "light": Map({"color": Ident("#231a16")})}
-fish_color_command {"dark": Map({"color": Ident("#ffb599")}), "default": Map({"color": Ident("#ffb599")}), "light": Map({"color": Ident("#8e4d32")})}
-fish_color_param {"dark": Map({"color": Ident("#d8c2bb")}), "default": Map({"color": Ident("#d8c2bb")}), "light": Map({"color": Ident("#53433e")})}
-fish_color_keyword {"dark": Map({"color": Ident("#d4c78e")}), "default": Map({"color": Ident("#d4c78e")}), "light": Map({"color": Ident("#685e30")})}
-fish_color_comment {"dark": Map({"color": Ident("#a08d86")}), "default": Map({"color": Ident("#a08d86")}), "light": Map({"color": Ident("#85736d")})}
-fish_color_operator {"dark": Map({"color": Ident("#e7beaf")}), "default": Map({"color": Ident("#e7beaf")}), "light": Map({"color": Ident("#77574b")})}
-fish_color_escape {"dark": Map({"color": Ident("#d4c78e")}), "default": Map({"color": Ident("#d4c78e")}), "light": Map({"color": Ident("#685e30")})}
-fish_color_quote {"dark": Map({"color": Ident("#5d4035")}), "default": Map({"color": Ident("#5d4035")}), "light": Map({"color": Ident("#ffdbce")})}
-fish_color_redirection {"dark": Map({"color": Ident("#ffb599")}), "default": Map({"color": Ident("#ffb599")}), "light": Map({"color": Ident("#8e4d32")})}
-fish_color_end {"dark": Map({"color": Ident("#ffb599")}), "default": Map({"color": Ident("#ffb599")}), "light": Map({"color": Ident("#8e4d32")})}
+fish_color_normal {"dark": Map({"color": Ident("#dee3e6")}), "default": Map({"color": Ident("#dee3e6")}), "light": Map({"color": Ident("#171c1f")})}
+fish_color_command {"dark": Map({"color": Ident("#88d0ed")}), "default": Map({"color": Ident("#88d0ed")}), "light": Map({"color": Ident("#0a6780")})}
+fish_color_param {"dark": Map({"color": Ident("#bfc8cc")}), "default": Map({"color": Ident("#bfc8cc")}), "light": Map({"color": Ident("#40484c")})}
+fish_color_keyword {"dark": Map({"color": Ident("#c4c3eb")}), "default": Map({"color": Ident("#c4c3eb")}), "light": Map({"color": Ident("#5b5b7e")})}
+fish_color_comment {"dark": Map({"color": Ident("#8a9296")}), "default": Map({"color": Ident("#8a9296")}), "light": Map({"color": Ident("#70787c")})}
+fish_color_operator {"dark": Map({"color": Ident("#b3cad5")}), "default": Map({"color": Ident("#b3cad5")}), "light": Map({"color": Ident("#4c626b")})}
+fish_color_escape {"dark": Map({"color": Ident("#c4c3eb")}), "default": Map({"color": Ident("#c4c3eb")}), "light": Map({"color": Ident("#5b5b7e")})}
+fish_color_quote {"dark": Map({"color": Ident("#354a53")}), "default": Map({"color": Ident("#354a53")}), "light": Map({"color": Ident("#cfe6f1")})}
+fish_color_redirection {"dark": Map({"color": Ident("#88d0ed")}), "default": Map({"color": Ident("#88d0ed")}), "light": Map({"color": Ident("#0a6780")})}
+fish_color_end {"dark": Map({"color": Ident("#88d0ed")}), "default": Map({"color": Ident("#88d0ed")}), "light": Map({"color": Ident("#0a6780")})}
 fish_color_error {"dark": Map({"color": Ident("#ffb4ab")}), "default": Map({"color": Ident("#ffb4ab")}), "light": Map({"color": Ident("#ba1a1a")})}
-fish_color_gray {"dark": Map({"color": Ident("#53433e")}), "default": Map({"color": Ident("#53433e")}), "light": Map({"color": Ident("#d8c2bb")})}
+fish_color_gray {"dark": Map({"color": Ident("#40484c")}), "default": Map({"color": Ident("#40484c")}), "light": Map({"color": Ident("#bfc8cc")})}
 
 # Completion colors
-fish_color_valid_path {"dark": Map({"color": Ident("#e7beaf")}), "default": Map({"color": Ident("#e7beaf")}), "light": Map({"color": Ident("#77574b")})}
-fish_color_autosuggestion {"dark": Map({"color": Ident("#a08d86")}), "default": Map({"color": Ident("#a08d86")}), "light": Map({"color": Ident("#85736d")})}
-fish_color_selection --background={"dark": Map({"color": Ident("#5d4035")}), "default": Map({"color": Ident("#5d4035")}), "light": Map({"color": Ident("#ffdbce")})}
-fish_color_search_match --background={"dark": Map({"color": Ident("#5d4035")}), "default": Map({"color": Ident("#5d4035")}), "light": Map({"color": Ident("#ffdbce")})} {"dark": Map({"color": Ident("#ffdbce")}), "default": Map({"color": Ident("#ffdbce")}), "light": Map({"color": Ident("#2c160d")})}
+fish_color_valid_path {"dark": Map({"color": Ident("#b3cad5")}), "default": Map({"color": Ident("#b3cad5")}), "light": Map({"color": Ident("#4c626b")})}
+fish_color_autosuggestion {"dark": Map({"color": Ident("#8a9296")}), "default": Map({"color": Ident("#8a9296")}), "light": Map({"color": Ident("#70787c")})}
+fish_color_selection --background={"dark": Map({"color": Ident("#354a53")}), "default": Map({"color": Ident("#354a53")}), "light": Map({"color": Ident("#cfe6f1")})}
+fish_color_search_match --background={"dark": Map({"color": Ident("#354a53")}), "default": Map({"color": Ident("#354a53")}), "light": Map({"color": Ident("#cfe6f1")})} {"dark": Map({"color": Ident("#cfe6f1")}), "default": Map({"color": Ident("#cfe6f1")}), "light": Map({"color": Ident("#071e26")})}
 fish_color_history_current --bold
 
 # Prompt and UI
-fish_pager_color_background --background={"dark": Map({"color": Ident("#1a110e")}), "default": Map({"color": Ident("#1a110e")}), "light": Map({"color": Ident("#fff8f6")})}
-fish_pager_color_prefix {"dark": Map({"color": Ident("#ffb599")}), "default": Map({"color": Ident("#ffb599")}), "light": Map({"color": Ident("#8e4d32")})} --bold
-fish_pager_color_completion {"dark": Map({"color": Ident("#d8c2bb")}), "default": Map({"color": Ident("#d8c2bb")}), "light": Map({"color": Ident("#53433e")})}
-fish_pager_color_description {"dark": Map({"color": Ident("#a08d86")}), "default": Map({"color": Ident("#a08d86")}), "light": Map({"color": Ident("#85736d")})}
-fish_pager_color_progress --background={"dark": Map({"color": Ident("#ffb599")}), "default": Map({"color": Ident("#ffb599")}), "light": Map({"color": Ident("#8e4d32")})} {"dark": Map({"color": Ident("#552009")}), "default": Map({"color": Ident("#552009")}), "light": Map({"color": Ident("#ffffff")})}
-fish_pager_color_selected_background --background={"dark": Map({"color": Ident("#5d4035")}), "default": Map({"color": Ident("#5d4035")}), "light": Map({"color": Ident("#ffdbce")})}
-fish_pager_color_selected_prefix {"dark": Map({"color": Ident("#ffdbce")}), "default": Map({"color": Ident("#ffdbce")}), "light": Map({"color": Ident("#2c160d")})} --bold
-fish_pager_color_selected_completion {"dark": Map({"color": Ident("#ffdbce")}), "default": Map({"color": Ident("#ffdbce")}), "light": Map({"color": Ident("#2c160d")})}
-fish_pager_color_selected_description {"dark": Map({"color": Ident("#ffdbce")}), "default": Map({"color": Ident("#ffdbce")}), "light": Map({"color": Ident("#2c160d")})}
+fish_pager_color_background --background={"dark": Map({"color": Ident("#0f1416")}), "default": Map({"color": Ident("#0f1416")}), "light": Map({"color": Ident("#f5fafd")})}
+fish_pager_color_prefix {"dark": Map({"color": Ident("#88d0ed")}), "default": Map({"color": Ident("#88d0ed")}), "light": Map({"color": Ident("#0a6780")})} --bold
+fish_pager_color_completion {"dark": Map({"color": Ident("#bfc8cc")}), "default": Map({"color": Ident("#bfc8cc")}), "light": Map({"color": Ident("#40484c")})}
+fish_pager_color_description {"dark": Map({"color": Ident("#8a9296")}), "default": Map({"color": Ident("#8a9296")}), "light": Map({"color": Ident("#70787c")})}
+fish_pager_color_progress --background={"dark": Map({"color": Ident("#88d0ed")}), "default": Map({"color": Ident("#88d0ed")}), "light": Map({"color": Ident("#0a6780")})} {"dark": Map({"color": Ident("#003544")}), "default": Map({"color": Ident("#003544")}), "light": Map({"color": Ident("#ffffff")})}
+fish_pager_color_selected_background --background={"dark": Map({"color": Ident("#354a53")}), "default": Map({"color": Ident("#354a53")}), "light": Map({"color": Ident("#cfe6f1")})}
+fish_pager_color_selected_prefix {"dark": Map({"color": Ident("#cfe6f1")}), "default": Map({"color": Ident("#cfe6f1")}), "light": Map({"color": Ident("#071e26")})} --bold
+fish_pager_color_selected_completion {"dark": Map({"color": Ident("#cfe6f1")}), "default": Map({"color": Ident("#cfe6f1")}), "light": Map({"color": Ident("#071e26")})}
+fish_pager_color_selected_description {"dark": Map({"color": Ident("#cfe6f1")}), "default": Map({"color": Ident("#cfe6f1")}), "light": Map({"color": Ident("#071e26")})}
